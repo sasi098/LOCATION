@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const LocationTracker = () => {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  const getLocation = () => {
+    setError("");
+    setLocation({ lat: null, lng: null });
+
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
+      setError("Geolocation not supported by your browser");
       return;
     }
 
@@ -16,18 +19,17 @@ const LocationTracker = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
-        setError("");
       },
       (err) => {
-        setError(`Error: ${err.message}`);
+        setError(`Error: ${err.message}. Please enable GPS and try again.`);
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        timeout: 20000, // ⬆ give more time
         maximumAge: 0,
       }
     );
-  }, []);
+  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -48,6 +50,7 @@ const LocationTracker = () => {
       ) : (
         !error && <p>Fetching location...</p>
       )}
+      <button onClick={getLocation}>🔄 Retry Location</button>
     </div>
   );
 };
